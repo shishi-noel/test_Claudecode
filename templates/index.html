@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>離職予測AI</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Hiragino Sans", "Meiryo", sans-serif;
+      background: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.10);
+      width: 100%;
+      max-width: 520px;
+      padding: 2.5rem 2.5rem 2rem;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #1a202c;
+      margin-bottom: .25rem;
+    }
+
+    .subtitle {
+      font-size: .875rem;
+      color: #718096;
+      margin-bottom: 2rem;
+    }
+
+    .field { margin-bottom: 1.25rem; }
+
+    label {
+      display: block;
+      font-size: .875rem;
+      font-weight: 600;
+      color: #4a5568;
+      margin-bottom: .4rem;
+    }
+
+    input, select {
+      width: 100%;
+      padding: .55rem .9rem;
+      border: 1.5px solid #cbd5e0;
+      border-radius: 8px;
+      font-size: 1rem;
+      color: #2d3748;
+      transition: border-color .2s;
+      background: #fff;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: #4299e1;
+    }
+
+    .hint {
+      font-size: .75rem;
+      color: #a0aec0;
+      margin-top: .25rem;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: .75rem;
+      background: #4299e1;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+      margin-top: .75rem;
+    }
+
+    button[type="submit"]:hover { background: #3182ce; }
+
+    .error {
+      background: #fff5f5;
+      border: 1px solid #fc8181;
+      color: #c53030;
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      font-size: .875rem;
+      margin-top: 1rem;
+    }
+
+    .result {
+      margin-top: 1.75rem;
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .result.low    { background: #f0fff4; border: 1.5px solid #68d391; }
+    .result.medium { background: #fffaf0; border: 1.5px solid #f6ad55; }
+    .result.high   { background: #fff5f5; border: 1.5px solid #fc8181; }
+
+    .result .prob {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .result.low    .prob { color: #276749; }
+    .result.medium .prob { color: #c05621; }
+    .result.high   .prob { color: #c53030; }
+
+    .result .label {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin-top: .5rem;
+    }
+
+    .result.low    .label { color: #276749; }
+    .result.medium .label { color: #c05621; }
+    .result.high   .label { color: #c53030; }
+
+    .result .desc {
+      font-size: .8125rem;
+      color: #718096;
+      margin-top: .4rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>離職予測AI</h1>
+    <p class="subtitle">従業員情報を入力して、離職リスクを予測します</p>
+
+    <form method="POST">
+      <div class="field">
+        <label for="age">年齢</label>
+        <input id="age" name="age" type="number" min="18" max="80" step="1"
+               value="{{ form_data.get('age', '') }}" placeholder="例: 35" required>
+      </div>
+
+      <div class="field">
+        <label for="gender">性別</label>
+        <select id="gender" name="gender" required>
+          <option value="" disabled {% if not form_data %}selected{% endif %}>選択してください</option>
+          <option value="0" {% if form_data.get('gender') == 0 %}selected{% endif %}>男性</option>
+          <option value="1" {% if form_data.get('gender') == 1 %}selected{% endif %}>女性</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="tenure">勤務年数</label>
+        <input id="tenure" name="tenure" type="number" min="0" max="50" step="1"
+               value="{{ form_data.get('tenure', '') }}" placeholder="例: 5" required>
+      </div>
+
+      <div class="field">
+        <label for="night_shifts">夜勤回数（月あたり）</label>
+        <input id="night_shifts" name="night_shifts" type="number" min="0" max="31" step="1"
+               value="{{ form_data.get('night_shifts', '') }}" placeholder="例: 8" required>
+      </div>
+
+      <div class="field">
+        <label for="stress">ストレス指標</label>
+        <input id="stress" name="stress" type="number" min="1" max="10" step="0.1"
+               value="{{ form_data.get('stress', '') }}" placeholder="例: 7.5" required>
+        <p class="hint">1（低い）〜 10（非常に高い）</p>
+      </div>
+
+      <button type="submit">予測する</button>
+    </form>
+
+    {% if error %}
+      <div class="error">{{ error }}</div>
+    {% endif %}
+
+    {% if result %}
+      <div class="result {{ result.risk_level }}">
+        <div class="prob">{{ result.prob }}%</div>
+        <div class="label">{{ result.risk_label }}</div>
+        <div class="desc">離職確率の予測値です</div>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>
