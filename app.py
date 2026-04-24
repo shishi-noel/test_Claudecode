@@ -25,10 +25,10 @@ def index():
     if request.method == "POST":
         try:
             form_data = {
-                "age":          int(request.form["age"]),
-                "gender":       int(request.form["gender"]),
-                "tenure":       int(request.form["tenure"]),
-                "night_shifts": int(request.form["night_shifts"]),
+                "age":          int(float(request.form["age"])),
+                "gender":       int(float(request.form["gender"])),
+                "tenure":       int(float(request.form["tenure"])),
+                "night_shifts": int(float(request.form["night_shifts"])),
                 "stress":       float(request.form["stress"]),
             }
 
