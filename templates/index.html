@@ -143,8 +143,12 @@
     <form method="POST">
       <div class="field">
         <label for="age">年齢</label>
-        <input id="age" name="age" type="number" min="18" max="80" step="1"
-               value="{{ form_data.get('age', '') }}" placeholder="例: 35" required>
+        <select id="age" name="age" required>
+          <option value="" disabled {% if not form_data %}selected{% endif %}>選択してください</option>
+          {% for a in range(18, 81) %}
+          <option value="{{ a }}" {% if form_data.get('age') == a %}selected{% endif %}>{{ a }} 歳</option>
+          {% endfor %}
+        </select>
       </div>
 
       <div class="field">
@@ -158,21 +162,33 @@
 
       <div class="field">
         <label for="tenure">勤務年数</label>
-        <input id="tenure" name="tenure" type="number" min="0" max="50" step="1"
-               value="{{ form_data.get('tenure', '') }}" placeholder="例: 5" required>
+        <select id="tenure" name="tenure" required>
+          <option value="" disabled {% if not form_data %}selected{% endif %}>選択してください</option>
+          {% for t in range(0, 51) %}
+          <option value="{{ t }}" {% if form_data.get('tenure') == t %}selected{% endif %}>{{ t }} 年</option>
+          {% endfor %}
+        </select>
       </div>
 
       <div class="field">
         <label for="night_shifts">夜勤回数（月あたり）</label>
-        <input id="night_shifts" name="night_shifts" type="number" min="0" max="31" step="1"
-               value="{{ form_data.get('night_shifts', '') }}" placeholder="例: 8" required>
+        <select id="night_shifts" name="night_shifts" required>
+          <option value="" disabled {% if not form_data %}selected{% endif %}>選択してください</option>
+          {% for n in range(0, 32) %}
+          <option value="{{ n }}" {% if form_data.get('night_shifts') == n %}selected{% endif %}>{{ n }} 回</option>
+          {% endfor %}
+        </select>
       </div>
 
       <div class="field">
         <label for="stress">ストレス指標</label>
-        <input id="stress" name="stress" type="number" min="1" max="10" step="0.1"
-               value="{{ form_data.get('stress', '') }}" placeholder="例: 7.5" required>
-        <p class="hint">1（低い）〜 10（非常に高い）</p>
+        <select id="stress" name="stress" required>
+          <option value="" disabled {% if not form_data %}selected{% endif %}>選択してください</option>
+          {% for s in range(2, 21) %}
+          <option value="{{ s / 2 }}" {% if form_data.get('stress') == s / 2 %}selected{% endif %}>{{ s / 2 }}（{% if s <= 4 %}低い{% elif s <= 12 %}普通{% elif s <= 16 %}高い{% else %}非常に高い{% endif %}）</option>
+          {% endfor %}
+        </select>
+        <p class="hint">1.0（低い）〜 10.0（非常に高い）</p>
       </div>
 
       <button type="submit">予測する</button>
