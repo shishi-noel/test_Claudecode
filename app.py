@@ -35,20 +35,10 @@ def index():
             prob = predict(**form_data, model=get_model())
             pct = round(prob * 100, 1)
 
-            tenure = form_data["tenure"]
-            if tenure >= 20:
-                high_thresh, mid_thresh = 0.40, 0.20
-            elif tenure >= 10:
-                high_thresh, mid_thresh = 0.50, 0.25
-            elif tenure >= 3:
-                high_thresh, mid_thresh = 0.60, 0.35
-            else:
-                high_thresh, mid_thresh = 0.70, 0.40
-
-            if prob >= high_thresh:
+            if prob >= 0.7:
                 risk_level = "high"
                 risk_label = "高リスク"
-            elif prob >= mid_thresh:
+            elif prob >= 0.4:
                 risk_level = "medium"
                 risk_label = "中リスク"
             else:
