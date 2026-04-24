@@ -30,7 +30,7 @@ def generate_training_data(n_samples: int = 5000, seed: int = 42) -> pd.DataFram
     logit = (
         -3.5
         + 0.03 * np.maximum(age - 45, 0)    # 45歳超で年齢が上がるにつれリスク増
-        - 0.15 * tenure                      # 勤務年数が長いほどリスク減
+        + 0.08 * tenure                      # 勤務年数が長いほどリスク増
         + 0.12 * night_shifts               # 夜勤回数が多いほどリスク増
         + 0.35 * stress                     # ストレスが高いほどリスク増
         + rng.normal(0, 0.5, n_samples)     # ノイズ
