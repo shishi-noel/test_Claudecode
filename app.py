@@ -25,15 +25,12 @@ def index():
     if request.method == "POST":
         try:
             form_data = {
-                "age":          float(request.form["age"]),
+                "age":          int(request.form["age"]),
                 "gender":       int(request.form["gender"]),
-                "tenure":       float(request.form["tenure"]),
-                "night_shifts": float(request.form["night_shifts"]),
+                "tenure":       int(request.form["tenure"]),
+                "night_shifts": int(request.form["night_shifts"]),
                 "stress":       float(request.form["stress"]),
             }
-
-            if not (1 <= form_data["stress"] <= 10):
-                raise ValueError("ストレス指標は 1〜10 の値を入力してください。")
 
             prob = predict(**form_data, model=get_model())
             pct = round(prob * 100, 1)
