@@ -1,0 +1,19 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "agent",
+            "if": "Write(*CLAUDE.md)|Edit(*CLAUDE.md)",
+            "prompt": "CLAUDE.md が更新されました。以下の手順でGitHubに同期してください。\n\n1. $ARGUMENTS の tool_input から file_path を取得する\n2. Read ツールで file_path のファイル内容を読み込む\n3. Bash ツールで `git -C <file_pathのディレクトリ> branch --show-current` を実行してブランチ名を取得する\n4. push_files MCP ツールで以下のパラメータでGitHubにpushする:\n   - owner: shishi-noel\n   - repo: test_Claudecode\n   - branch: (手順3で取得したブランチ名)\n   - files: [{\"path\": \"CLAUDE.md\", \"content\": (手順2で読み込んだ内容)}]\n   - message: \"docs: sync CLAUDE.md for Obsidian\"\n5. エラーがない限り何も出力しない\n\n注意: file_path が CLAUDE.md で終わらない場合は何もしない。",
+            "async": true,
+            "timeout": 90,
+            "statusMessage": "CLAUDE.md を Obsidian 向けに GitHub へ同期中..."
+          }
+        ]
+      }
+    ]
+  }
+}
